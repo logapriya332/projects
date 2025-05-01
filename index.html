@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EventLine - Vibrant Scheduler</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #fefefe;
+      --text: #222;
+      --card: #ffffffcc;
+      --accent: #ff8a00;
+      --footer-bg: #333;
+      --footer-text: #f2f2f2;
+      --shadow: rgba(0, 0, 0, 0.1);
+      --link-hover: #ff6347;
+    }
+
+    [data-theme="dark"] {
+      --bg: #121212;
+      --text: #f2f2f2;
+      --card: #1f1f1fcc;
+      --accent: #ff7f50;
+      --footer-bg: #212121;
+      --footer-text: #ffffff;
+      --shadow: rgba(255, 255, 255, 0.1);
+      --link-hover: #ff9c42;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      transition: 0.3s ease;
+    }
+
+    header {
+      background: linear-gradient(to right, #ff6f61, #ff8a00);
+      color: white;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    nav a {
+      color: white;
+      margin: 0 12px;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    nav a:hover {
+      color: var(--link-hover);
+    }
+
+    .theme-toggle {
+      background: white;
+      color: var(--accent);
+      border: none;
+      padding: 5px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .hero {
+   background-color: #007BFF; /* Optional: fallback background */
+  color: white;
+  text-align: center;
+  padding: 5rem 1rem; /* Adjust for vertical space */
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+}
+
+
+   .hero h1 {
+     font-size: 3rem;
+     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+   }
+
+    .hero p {
+      font-size: 1.2rem;
+      margin-top: 0.5rem;
+    }
+
+    .calendar-section {
+      max-width: 1100px;
+      margin: auto;
+      padding: 4rem 1.5rem;
+    }
+
+    .calendar-title {
+      text-align: center;
+      font-size: 2.5rem;
+      margin-bottom: 2rem;
+      color: #ff6347;
+      text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+    }
+
+    .search-bar {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .search-bar input {
+      padding: 12px;
+      font-size: 1rem;
+      width: 90%;
+      max-width: 450px;
+      border-radius: 8px;
+      border: 2px solid #ddd;
+      outline: none;
+      transition: border-color 0.3s ease;
+    }
+
+    .search-bar input:focus {
+      border-color: #ff6347;
+    }
+
+    .event-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 25px;
+    }
+
+    .event {
+      padding: 20px;
+      border-radius: 16px;
+      background: var(--card);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 10px 25px var(--shadow);
+      border-left: 6px solid;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .event:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.2);
+    }
+
+    .event-title {
+      font-size: 1.3rem;
+      font-weight: bold;
+      color: var(--text);
+    }
+
+    .event-time {
+      color: #666;
+      font-size: 0.95rem;
+      margin-bottom: 10px;
+    }
+
+    .event-desc {
+      font-size: 1rem;
+      margin-top: 6px;
+      color: #555;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      font-size: 0.75rem;
+      border-radius: 100px;
+      font-weight: 600;
+      margin-bottom: 10px;
+      color: white;
+      background: linear-gradient(to right, #ff6f61, #ff8a00);
+    }
+
+    .event.meeting { border-color: #4dabf5; }
+    .event.meeting .badge { background: linear-gradient(to right, #4caf50, #66bb6a); }
+
+    .event.health { border-color: #66bb6a; }
+    .event.health .badge { background: linear-gradient(to right, #81c784, #4caf50); }
+
+    .event.party { border-color: #f06292; }
+    .event.party .badge { background: linear-gradient(to right, #f48fb1, #ec407a); }
+
+    .event.business { border-color: #ffa726; }
+    .event.business .badge { background: linear-gradient(to right, #fb8c00, #ff7043); }
+
+    footer {
+      background: var(--footer-bg);
+      color: var(--footer-text);
+      padding: 2rem;
+      text-align: left;
+      margin-top: 4rem;
+    }
+
+    footer p {
+      color: var(--footer-text);
+      font-size: 1rem;
+    }
+
+    footer a {
+      color: var(--footer-text);
+      text-decoration: none;
+      font-weight: bold;
+      text-align: left;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+      text-align: left;
+    }
+
+    @media (max-width: 600px) {
+      .hero h1 {
+        font-size: 2.5rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <h1>EventLine</h1>
+    <nav>
+      <a href="#home">Home</a>
+      <a href="#calendar">Calendar</a>
+      <a href="#contact">Contact</a>
+    </nav>
+    <button class="theme-toggle" onclick="toggleTheme()">🌞 / 🌙</button>
+  </header>
+
+  <section class="hero" id="home">
+  <h1>Brighten Your Day with Better Planning</h1>
+  <p>Organize your time with vibrant clarity!</p>
+</section>
+
+
+  <section class="calendar-section" id="calendar">
+    <h2 class="calendar-title">Upcoming Events</h2>
+
+
+    <div class="search-bar">
+      <input type="text" id="searchInput" placeholder="Search by title or date..." onkeyup="filterEvents()" />
+    </div>
+
+    <div class="event-list" id="eventList">
+
+      <!-- Sample Event -->
+      <div class="event meeting">
+       <img src="https://www.meetingsnet.com/sites/meetingsnet.com/files/styles/article_featured_retina/public/team_meeting.jpg?itok=PrRWlmSG" alt="Team Meeting" style="width: 100%; border-radius: 12px; margin-bottom: 12px;">
+        <div class="badge">Meeting</div>
+        <div class="event-title">Team Sync</div>
+        <div class="event-time">April 28, 10:00 AM - 11:00 AM</div>
+        <div class="event-desc">Weekly update with the development team. Discuss the project status and upcoming milestones.</div>
+      </div>
+
+      <div class="event health">
+	<img src="https://th.bing.com/th/id/OIP.b8VbLN4ylTgUrE4Bj8ioDQHaE8?w=724&h=483&rs=1&pid=ImgDetMain" alt="Team Meeting" style="width: 100%; border-radius: 12px; margin-bottom: 12px;">
+        <div class="badge">Health</div>
+        <div class="event-title">Doctor Appointment</div>
+        <div class="event-time">April 30, 3:00 PM</div>
+        <div class="event-desc">Routine health check-up at City Clinic. Make sure to bring your health documents.</div>
+      </div>
+
+      <div class="event business">
+	<img src="https://th.bing.com/th/id/OIP.o9_AG4NF91T-YnPHP5DkAQAAAA?rs=1&pid=ImgDetMain" alt="Team Meeting" style="width: 100%; border-radius: 12px; margin-bottom: 12px;">
+        <div class="badge">Business</div>
+        <div class="event-title">Startup Conference</div>
+        <div class="event-time">May 10, 9:00 AM - 5:00 PM</div>
+        <div class="event-desc">Talks and panels on entrepreneurship and tech trends. Network with industry professionals.</div>
+      </div>
+
+      <!-- New Events Added -->
+      <div class="event meeting">
+	<img src="https://th.bing.com/th/id/OIP.1QvMIwigOk7wXABkUHw90gHaDm?w=1261&h=613&rs=1&pid=ImgDetMain" alt="Team Meeting" style="width: 100%; border-radius: 12px; margin-bottom: 12px;">
+        <div class="badge">Meeting</div>
+        <div class="event-title">Client Presentation</div>
+        <div class="event-time">May 12, 2:00 PM - 3:00 PM</div>
+        <div class="event-desc">Presenting the final design proposal to the client. Ensure all updates are reflected.</div>
+      </div>
+
+      <div class="event travel">
+	<img src="https://th.bing.com/th/id/OIP.bBKCCX8Cy4-kaECTkPci6wHaE8?w=3072&h=2048&rs=1&pid=ImgDetMain" alt="Team Meeting" style="width: 100%; border-radius: 12px; margin-bottom: 12px;">
+        <div class="badge">Travel</div>
+        <div class="event-title">Business Trip to New York</div>
+        <div class="event-time">May 15, 7:00 AM - May 17, 9:00 PM</div>
+        <div class="event-desc">Attend the annual business expo and meet with partners for a strategic meeting.</div>
+      </div>
+
+      <div class="event deadline">
+	<img src="https://www.hsbmarine.com/storage/media/page/28/888/project-submission.jpg" alt="Team Meeting" style="width: 100%; border-radius: 12px; margin-bottom: 12px;">
+        <div class="badge">Deadline</div>
+        <div class="event-title">Project Submission</div>
+        <div class="event-time">May 20, 11:59 PM</div>
+        <div class="event-desc">Final submission of the project report. Ensure all revisions are completed and reviewed.</div>
+      </div>
+
+      <div class="event personal">
+	<img src="https://img.freepik.com/premium-vector/2nd-anniversary-logo-golden-color-celebration-event-wedding-greeting-card-invitation-round_668376-93.jpg?w=740" alt="Team Meeting" style="width: 100%; border-radius: 12px; margin-bottom: 12px;">
+        <div class="badge">Personal</div>
+        <div class="event-title">Anniversary Celebration</div>
+        <div class="event-time">June 26, 7:30 PM - 9:00 PM</div>
+        <div class="event-desc">Celebrating 2 years together with a romantic dinner at the lakeside restaurant.</div>
+      </div>
+
+    </div>
+  </section>
+
+<section class="hero" id="contact" style="background: url('https://c.tadst.com/gfx/900x506/time-stopwatch-sand.jpg?1.jpg') no-repeat center center/cover; color: #333; text-align:left;padding-left: 5rem;">
+<h1>Contact Us</h1>
+    <p>
+  <span style="color: #000000; font-weight: bold; font-size: 2rem;">
+    anarayanan198@gmail.com
+  </span>
+</p>
+
+  </section>
+
+  <footer>
+    <p>&copy; 2025 EventLine. All rights reserved. <br><a href="#contact">Contact us</a></p>
+  </footer>
+
+<script>
+  function filterEvents() {
+    const input = document.getElementById('searchInput').value.toLowerCase();
+    const events = document.querySelectorAll('.event');
+    events.forEach(event => {
+      const content = event.innerText.toLowerCase();
+      event.style.display = content.includes(input) ? '' : 'none';
+    });
+  }
+
+  function toggleTheme() {
+    const html = document.documentElement;
+    const current = html.getAttribute('data-theme');
+    html.setAttribute('data-theme', current === 'light' ? 'dark' : 'light');
+  }
+
+  // Render event to DOM only (no saving)
+  function renderEvent(event) {
+    const list = document.getElementById('eventList');
+    const card = document.createElement('div');
+    card.className = `event ${event.type || 'meeting'}`;
+    card.innerHTML = `
+      <img src="https://via.placeholder.com/400x200?text=${event.type || 'Event'}" style="width:100%; border-radius:12px; margin-bottom:12px;">
+      <div class="badge">${event.type || 'Event'}</div>
+      <div class="event-title">${event.title}</div>
+      <div class="event-time">${event.time}</div>
+      <div class="event-desc">${event.desc}</div>
+    `;
+    list.appendChild(card);
+  }
+
+  // Hook form submit
+  document.getElementById('eventForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    const eventData = {
+      title: document.getElementById('title').value,
+      time: document.getElementById('time').value,
+      desc: document.getElementById('desc').value,
+      type: document.getElementById('type').value
+    };
+    renderEvent(eventData);
+    this.reset();
+  });
+
+  // No backend fetch — events won't persist after refresh
+</script>
+
+
+</body>
+</html>
+
+
+
