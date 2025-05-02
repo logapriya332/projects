@@ -314,7 +314,7 @@
         <div class="event-title">Team Sync</div>
         <div class="event-time">April 28, 10:00 AM - 11:00 AM</div>
         <div class="event-desc">Weekly update with the development team. Discuss the project status and upcoming milestones.</div>
-      </div>
+<button onclick="this.closest('.event').remove()" style="margin-top: 12px; padding: 6px 12px; background: #e74c3c; color: white; border: none; border-radius: 6px;">Delete</button>      </div>
 	<p id="noResults" style="text-align: center; margin-top: 2rem; font-size: 1.2rem; display: none; color: #888;">
   No events found.
 </p>
@@ -325,7 +325,7 @@
         <div class="event-title">Doctor Appointment</div>
         <div class="event-time">April 30, 3:00 PM</div>
         <div class="event-desc">Routine health check-up at City Clinic. Make sure to bring your health documents.</div>
-      </div>
+<button onclick="this.closest('.event').remove()" style="margin-top: 12px; padding: 6px 12px; background: #e74c3c; color: white; border: none; border-radius: 6px;">Delete</button>      </div>
 
       <div class="event business">
 	<img src="https://th.bing.com/th/id/OIP.o9_AG4NF91T-YnPHP5DkAQAAAA?rs=1&pid=ImgDetMain" alt="Team Meeting" style="width: 100%; border-radius: 12px; margin-bottom: 12px;">
@@ -333,7 +333,7 @@
         <div class="event-title">Startup Conference</div>
         <div class="event-time">May 10, 9:00 AM - 5:00 PM</div>
         <div class="event-desc">Talks and panels on entrepreneurship and tech trends. Network with industry professionals.</div>
-      </div>
+<button onclick="this.closest('.event').remove()" style="margin-top: 12px; padding: 6px 12px; background: #e74c3c; color: white; border: none; border-radius: 6px;">Delete</button>      </div>
 
       <!-- New Events Added -->
       <div class="event meeting">
@@ -342,6 +342,7 @@
         <div class="event-title">Client Presentation</div>
         <div class="event-time">May 12, 2:00 PM - 3:00 PM</div>
         <div class="event-desc">Presenting the final design proposal to the client. Ensure all updates are reflected.</div>
+<button onclick="this.closest('.event').remove()" style="margin-top: 12px; padding: 6px 12px; background: #e74c3c; color: white; border: none; border-radius: 6px;">Delete</button>
       </div>
 
       <div class="event travel">
@@ -350,6 +351,7 @@
         <div class="event-title">Business Trip to New York</div>
         <div class="event-time">May 15, 7:00 AM - May 17, 9:00 PM</div>
         <div class="event-desc">Attend the annual business expo and meet with partners for a strategic meeting.</div>
+<button onclick="this.closest('.event').remove()" style="margin-top: 12px; padding: 6px 12px; background: #e74c3c; color: white; border: none; border-radius: 6px;">Delete</button>
       </div>
 
       <div class="event deadline">
@@ -358,6 +360,7 @@
         <div class="event-title">Project Submission</div>
         <div class="event-time">May 20, 11:59 PM</div>
         <div class="event-desc">Final submission of the project report. Ensure all revisions are completed and reviewed.</div>
+<button onclick="this.closest('.event').remove()" style="margin-top: 12px; padding: 6px 12px; background: #e74c3c; color: white; border: none; border-radius: 6px;">Delete</button>
       </div>
 
       <div class="event personal">
@@ -365,6 +368,8 @@
         <div class="badge">Personal</div>
         <div class="event-title">Anniversary Celebration</div>
         <div class="event-time">June 26, 7:30 PM - 9:00 PM</div>
+         <button onclick="this.closest('.event').remove()" style="margin-top: 12px; padding: 6px 12px; background: #e74c3c; color: white; border: none; border-radius: 6px;">Delete</button>
+
         <div class="event-desc">Celebrating 2 years together with a romantic dinner at the lakeside restaurant.</div>
       </div>
 
@@ -412,13 +417,18 @@ function renderEvent(event) {
 }
 
   // ⬇️ You add this function here 
+function deleteEvent(button) {
+  const card = button.closest('.event');
+  const fullId = card.id; // e.g., "event-abc123"
+  const eventId = fullId.replace("event-", ""); // Get just "abc123"
 
-  function deleteEvent(eventId) {
-  let events = getEventsFromStorage();
-  events = events.filter(e => e.id !== eventId); // filter out the deleted event
-  saveEventsToStorage(events); // save the updated list
-  const el = document.getElementById(`event-${eventId}`);
-  if (el) el.remove(); // remove the element from DOM
+  // Remove from DOM
+  card.remove();
+
+  // Remove from localStorage
+  const events = getEventsFromStorage(); // Should return an array
+  const updatedEvents = events.filter(event => event.id !== eventId);
+  saveEventsToStorage(updatedEvents);
 }
 
   function loadAllEvents() {
@@ -494,6 +504,21 @@ function renderEvent(event) {
     const html = document.documentElement;
     html.setAttribute('data-theme', html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
   }
+
+   function loadAllEvents() {
+  let events = getEventsFromStorage();
+  let changed = false;
+
+  events.forEach(event => {
+    if (!event.id) {
+      event.id = Date.now().toString() + Math.random().toString(36).substr(2, 5);
+      changed = true;
+    }
+    renderEvent(event);
+  });
+
+  if (changed) saveEventsToStorage(events);
+}
 </script>
 </body>
 </html>
