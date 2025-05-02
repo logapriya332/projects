@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
 <head>
@@ -248,6 +249,57 @@
   <section class="calendar-section" id="calendar">
     <h2 class="calendar-title">Upcoming Events</h2>
 
+<!-- Add New Event Form -->
+  <section class="calendar-section" style="padding-top: 0;">
+  <h3 style="text-align:center; font-size: 1.8rem; margin-bottom: 1rem;">Add New Event</h3>
+
+  <form id="eventForm" enctype="multipart/form-data"
+    style="max-width: 600px; margin: 2rem auto; background: #fff; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+    
+    <input id="title" placeholder="Title" required 
+      style="width:100%; padding: 12px 16px; margin: 10px 0; border: 1px solid #ccc; border-radius: 8px; font-size: 1rem;" />
+
+    <input id="time" placeholder="Time" required 
+      style="width:100%; padding: 12px 16px; margin: 10px 0; border: 1px solid #ccc; border-radius: 8px; font-size: 1rem;" />
+
+    <input id="type" placeholder="Type (e.g. meeting, health)" required 
+      style="width:100%; padding: 12px 16px; margin: 10px 0; border: 1px solid #ccc; border-radius: 8px; font-size: 1rem;" />
+
+    <textarea id="desc" placeholder="Description" required 
+      style="width:100%; padding: 12px 16px; margin: 10px 0; border: 1px solid #ccc; border-radius: 8px; font-size: 1rem; resize: vertical; min-height: 100px;"></textarea>
+
+    <!-- Image upload input -->
+    <input type="file" id="image" accept="image/*"
+      style="width:100%; margin: 10px 0; padding: 8px;" />
+
+    <!-- Image preview -->
+    <div id="imagePreview" style="text-align: center; margin: 10px 0;"></div>
+
+    <button type="submit" 
+      style="width: 100%; padding: 12px; background: orange; color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer; transition: background 0.3s;">
+      Add Event
+    </button>
+  </form>
+</section>
+
+ <script>
+    document.getElementById('image').addEventListener('change', function (event) {
+      const preview = document.getElementById('imagePreview');
+      preview.innerHTML = ''; // Clear previous
+
+      const file = event.target.files[0];
+      if (file && file.type.startsWith('image/')) {
+        const img = document.createElement('img');
+        img.src = URL.createObjectURL(file);
+        img.style.maxWidth = '100%';
+        img.style.borderRadius = '8px';
+        preview.appendChild(img);
+      }
+    });
+  </script>
+
+
+
 
     <div class="search-bar">
       <input type="text" id="searchInput" placeholder="Search by title or date..." onkeyup="filterEvents()" />
@@ -263,10 +315,9 @@
         <div class="event-time">April 28, 10:00 AM - 11:00 AM</div>
         <div class="event-desc">Weekly update with the development team. Discuss the project status and upcoming milestones.</div>
       </div>
-       <p id="noResults" style="text-align: center; margin-top: 2rem; font-size: 1.2rem; display: none; color: #888;">
-          No events found.
-       </p>
-
+	<p id="noResults" style="text-align: center; margin-top: 2rem; font-size: 1.2rem; display: none; color: #888;">
+  No events found.
+</p>
 
       <div class="event health">
 	<img src="https://th.bing.com/th/id/OIP.b8VbLN4ylTgUrE4Bj8ioDQHaE8?w=724&h=483&rs=1&pid=ImgDetMain" alt="Team Meeting" style="width: 100%; border-radius: 12px; margin-bottom: 12px;">
@@ -324,7 +375,7 @@
 <h1>Contact Us</h1>
     <p>
   <span style="color: #000000; font-weight: bold; font-size: 2rem;">
-    logapriya137@gmail.com
+    anarayanan198@gmail.com
   </span>
 </p>
 
@@ -334,65 +385,116 @@
     <p>&copy; 2025 EventLine. All rights reserved. <br><a href="#contact">Contact us</a></p>
   </footer>
 
-
 <script>
-  function filterEvents() {
-  const input = document.getElementById('searchInput').value.toLowerCase();
-  const events = document.querySelectorAll('.event');
-  const noResults = document.getElementById('noResults');
+  function getEventsFromStorage() {
+    return JSON.parse(localStorage.getItem('events')) || [];
+  }
 
-  let anyVisible = false;
+  function saveEventsToStorage(events) {
+    localStorage.setItem('events', JSON.stringify(events));
+  }
+function renderEvent(event) {
+  const list = document.getElementById('eventList');
+  const card = document.createElement('div');
+  card.className = `event ${event.type || 'meeting'}`;
+  card.id = `event-${event.id}`;
 
-  events.forEach(event => {
-    const content = event.innerText.toLowerCase();
-    const match = content.includes(input);
-    event.style.display = match ? '' : 'none';
-    if (match) anyVisible = true;
-  });
+  card.innerHTML = `
+    <img src="${event.image || `https://via.placeholder.com/400x200?text=${event.type || 'Event'}`}" style="width:100%; border-radius:12px; margin-bottom:12px;">
+    <div class="badge">${event.type || 'Event'}</div>
+    <div class="event-title">${event.title}</div>
+    <div class="event-time">${event.time}</div>
+    <div class="event-desc">${event.desc}</div>
+    <button onclick="deleteEvent('${event.id}')" style="margin-top: 12px; padding: 6px 12px; background: #e74c3c; color: white; border: none; border-radius: 6px;">Delete</button>
+  `;
 
-  noResults.style.display = anyVisible ? 'none' : 'block';
+  list.appendChild(card);
 }
 
+  // ⬇️ You add this function here 
+
+  function deleteEvent(eventId) {
+  let events = getEventsFromStorage();
+  events = events.filter(e => e.id !== eventId); // filter out the deleted event
+  saveEventsToStorage(events); // save the updated list
+  const el = document.getElementById(`event-${eventId}`);
+  if (el) el.remove(); // remove the element from DOM
+}
+
+  function loadAllEvents() {
+    const events = getEventsFromStorage();
+    events.forEach(renderEvent);
+  }
+
+  document.addEventListener('DOMContentLoaded', loadAllEvents);
+
+ document.getElementById('eventForm').addEventListener('submit', function (e) {
+  e.preventDefault();
+
+  const title = document.getElementById('title').value;
+  const time = document.getElementById('time').value;
+  const type = document.getElementById('type').value.toLowerCase();
+  const desc = document.getElementById('desc').value;
+  const imageInput = document.getElementById('image');
+  const imageFile = imageInput.files[0];
+
+  const newEvent = {
+    id: Date.now().toString(),
+    title,
+    time,
+    type,
+    desc,
+    image: ''
+  };
+
+  if (imageFile) {
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      newEvent.image = e.target.result;
+      const events = getEventsFromStorage();
+      events.push(newEvent);
+      saveEventsToStorage(events);
+      renderEvent(newEvent);
+      document.getElementById('eventForm').reset();
+      document.getElementById('imagePreview').innerHTML = '';
+    };
+    reader.readAsDataURL(imageFile);
+  } else {
+    const events = getEventsFromStorage();
+    events.push(newEvent);
+    saveEventsToStorage(events);
+    renderEvent(newEvent);
+    document.getElementById('eventForm').reset();
+    document.getElementById('imagePreview').innerHTML = '';
+  }
+});
+
+
+  function filterEvents() {
+    const input = document.getElementById('searchInput').value.toLowerCase();
+    const events = document.querySelectorAll('.event');
+    let matches = 0;
+
+    events.forEach(event => {
+      const title = event.querySelector('.event-title').textContent.toLowerCase();
+      const time = event.querySelector('.event-time').textContent.toLowerCase();
+
+      if (title.includes(input) || time.includes(input)) {
+        event.style.display = 'block';
+        matches++;
+      } else {
+        event.style.display = 'none';
+      }
+    });
+
+    document.getElementById('noResults').style.display = matches === 0 ? 'block' : 'none';
+  }
 
   function toggleTheme() {
     const html = document.documentElement;
-    const current = html.getAttribute('data-theme');
-    html.setAttribute('data-theme', current === 'light' ? 'dark' : 'light');
+    html.setAttribute('data-theme', html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
   }
-
-  // Render event to DOM only (no saving)
-  function renderEvent(event) {
-    const list = document.getElementById('eventList');
-    const card = document.createElement('div');
-    card.className = `event ${event.type || 'meeting'}`;
-    card.innerHTML = `
-      <img src="https://via.placeholder.com/400x200?text=${event.type || 'Event'}" style="width:100%; border-radius:12px; margin-bottom:12px;">
-      <div class="badge">${event.type || 'Event'}</div>
-      <div class="event-title">${event.title}</div>
-      <div class="event-time">${event.time}</div>
-      <div class="event-desc">${event.desc}</div>
-    `;
-    list.appendChild(card);
-  }
-
-  // Hook form submit
-  document.getElementById('eventForm').addEventListener('submit', function (e) {
-    e.preventDefault();
-    const eventData = {
-      title: document.getElementById('title').value,
-      time: document.getElementById('time').value,
-      desc: document.getElementById('desc').value,
-      type: document.getElementById('type').value
-    };
-    renderEvent(eventData);
-    this.reset();
-  });
-
-  // No backend fetch — events won't persist after refresh
 </script>
-
-
-
 </body>
 </html>
 
