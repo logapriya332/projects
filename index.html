@@ -392,134 +392,149 @@
 
 <script>
   function getEventsFromStorage() {
-    return JSON.parse(localStorage.getItem('events')) || [];
+    return JSON.parse(localStorage.getItem("events")) || [];
   }
 
   function saveEventsToStorage(events) {
-    localStorage.setItem('events', JSON.stringify(events));
+    localStorage.setItem("events", JSON.stringify(events));
   }
-function renderEvent(event) {
-  const list = document.getElementById('eventList');
-  const card = document.createElement('div');
-  card.className = `event ${event.type || 'meeting'}`;
-  card.id = `event-${event.id}`;
+
+  function renderEvent(event) {
+  const list = document.getElementById("eventList");
+  const card = document.createElement("div");
+  card.className = `event ${event.type}`;
+  
+  // ✅ Add this line to associate data-id with the card
+  card.dataset.id = event.id;
 
   card.innerHTML = `
-    <img src="${event.image || `https://via.placeholder.com/400x200?text=${event.type || 'Event'}`}" style="width:100%; border-radius:12px; margin-bottom:12px;">
-    <div class="badge">${event.type || 'Event'}</div>
+    <img src="${event.image || `https://via.placeholder.com/400x200?text=${event.type}`}" style="width:100%; border-radius: 12px; margin-bottom: 12px;">
+    <div class="badge">${capitalize(event.type)}</div>
     <div class="event-title">${event.title}</div>
     <div class="event-time">${event.time}</div>
     <div class="event-desc">${event.desc}</div>
     <button onclick="deleteEvent('${event.id}')" style="margin-top: 12px; padding: 6px 12px; background: #e74c3c; color: white; border: none; border-radius: 6px;">Delete</button>
   `;
-
+  
   list.appendChild(card);
 }
 
-  // ⬇️ You add this function here 
-function deleteEvent(button) {
-  const card = button.closest('.event');
-  const fullId = card.id; // e.g., "event-abc123"
-  const eventId = fullId.replace("event-", ""); // Get just "abc123"
+function deleteEvent(eventId) {
+  // Remove from localStorage
+  let events = getEventsFromStorage();
+  events = events.filter(event => event.id !== eventId);
+  saveEventsToStorage(events);
 
   // Remove from DOM
-  card.remove();
-
-  // Remove from localStorage
-  const events = getEventsFromStorage(); // Should return an array
-  const updatedEvents = events.filter(event => event.id !== eventId);
-  saveEventsToStorage(updatedEvents);
+  const eventCard = document.querySelector(`[data-id='${eventId}']`);
+  if (eventCard) {
+    eventCard.remove();
+  }
 }
 
-  function loadAllEvents() {
-    const events = getEventsFromStorage();
-    events.forEach(renderEvent);
+  function previewImage(event) {
+    const preview = document.getElementById("imagePreview");
+    preview.innerHTML = "";
+    const file = event.target.files[0];
+    if (file) {
+      const img = document.createElement("img");
+      img.src = URL.createObjectURL(file);
+      img.onload = () => URL.revokeObjectURL(img.src);
+      preview.appendChild(img);
+    }
   }
 
-  document.addEventListener('DOMContentLoaded', loadAllEvents);
+  function filterEvents() {
+    const search = document.getElementById("searchInput").value.toLowerCase();
+    document.querySelectorAll(".event").forEach(card => {
+      card.style.display = card.textContent.toLowerCase().includes(search) ? "" : "none";
+    });
+  }
 
- document.getElementById('eventForm').addEventListener('submit', function (e) {
-  e.preventDefault();
+  function capitalize(word) {
+    return word.charAt(0).toUpperCase() + word.slice(1);
+  }
 
-  const title = document.getElementById('title').value;
-  const time = document.getElementById('time').value;
-  const type = document.getElementById('type').value.toLowerCase();
-  const desc = document.getElementById('desc').value;
-  const imageInput = document.getElementById('image');
-  const imageFile = imageInput.files[0];
+  document.getElementById("eventForm").addEventListener("submit", function (e) {
+    e.preventDefault();
 
-  const newEvent = {
-    id: Date.now().toString(),
-    title,
-    time,
-    type,
-    desc,
-    image: ''
-  };
+    const title = document.getElementById("title").value;
+    const time = document.getElementById("time").value;
+    const type = document.getElementById("type").value.toLowerCase();
+    const desc = document.getElementById("desc").value;
+    const imageInput = document.getElementById("image");
+    const file = imageInput.files[0];
 
-  if (imageFile) {
-    const reader = new FileReader();
-    reader.onload = function (e) {
-      newEvent.image = e.target.result;
-      const events = getEventsFromStorage();
-      events.push(newEvent);
-      saveEventsToStorage(events);
-      renderEvent(newEvent);
-      document.getElementById('eventForm').reset();
-      document.getElementById('imagePreview').innerHTML = '';
+if (file) {
+  const reader = new FileReader();
+  reader.onload = function () {
+    const image = reader.result;
+    const newEvent = {
+      id: Date.now(),
+      title,
+      time,
+      type,
+      desc,
+      image
     };
-    reader.readAsDataURL(imageFile);
-  } else {
     const events = getEventsFromStorage();
     events.push(newEvent);
     saveEventsToStorage(events);
     renderEvent(newEvent);
-    document.getElementById('eventForm').reset();
-    document.getElementById('imagePreview').innerHTML = '';
-  }
-});
+    document.getElementById("eventForm").reset();
+    document.getElementById("imagePreview").innerHTML = "";
+  };
+  reader.readAsDataURL(file);
+} else {
+  const newEvent = {
+    id: Date.now(),
+    title,
+    time,
+    type,
+    desc,
+    image: ""
+  };
+  const events = getEventsFromStorage();
+  events.push(newEvent);
+  saveEventsToStorage(events);
+  renderEvent(newEvent);
+  document.getElementById("eventForm").reset();
+  document.getElementById("imagePreview").innerHTML = "";
+}
 
 
-  function filterEvents() {
-    const input = document.getElementById('searchInput').value.toLowerCase();
-    const events = document.querySelectorAll('.event');
-    let matches = 0;
+    const newEvent = {
+      id: Date.now(),
+      title,
+      time,
+      type,
+      desc,
+      image
+    };
 
-    events.forEach(event => {
-      const title = event.querySelector('.event-title').textContent.toLowerCase();
-      const time = event.querySelector('.event-time').textContent.toLowerCase();
-
-      if (title.includes(input) || time.includes(input)) {
-        event.style.display = 'block';
-        matches++;
-      } else {
-        event.style.display = 'none';
-      }
-    });
-
-    document.getElementById('noResults').style.display = matches === 0 ? 'block' : 'none';
-  }
-
-  function toggleTheme() {
-    const html = document.documentElement;
-    html.setAttribute('data-theme', html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
-  }
-
-   function loadAllEvents() {
-  let events = getEventsFromStorage();
-  let changed = false;
-
-  events.forEach(event => {
-    if (!event.id) {
-      event.id = Date.now().toString() + Math.random().toString(36).substr(2, 5);
-      changed = true;
-    }
-    renderEvent(event);
+    const events = getEventsFromStorage();
+    events.push(newEvent);
+    saveEventsToStorage(events);
+    renderEvent(newEvent);
+    e.target.reset();
+    document.getElementById("imagePreview").innerHTML = "";
   });
 
-  if (changed) saveEventsToStorage(events);
-}
+  function toggleTheme() {
+    const current = document.documentElement.getAttribute("data-theme");
+    const newTheme = current === "dark" ? "light" : "dark";
+    document.documentElement.setAttribute("data-theme", newTheme);
+    localStorage.setItem("theme", newTheme);
+  }
+
+  window.addEventListener("DOMContentLoaded", () => {
+    const savedTheme = localStorage.getItem("theme") || "light";
+    document.documentElement.setAttribute("data-theme", savedTheme);
+    const events = getEventsFromStorage();
+    events.forEach(renderEvent);
+  });
 </script>
+
 </body>
 </html>
 
