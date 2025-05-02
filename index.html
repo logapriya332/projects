@@ -263,6 +263,10 @@
         <div class="event-time">April 28, 10:00 AM - 11:00 AM</div>
         <div class="event-desc">Weekly update with the development team. Discuss the project status and upcoming milestones.</div>
       </div>
+       <p id="noResults" style="text-align: center; margin-top: 2rem; font-size: 1.2rem; display: none; color: #888;">
+          No events found.
+       </p>
+
 
       <div class="event health">
 	<img src="https://th.bing.com/th/id/OIP.b8VbLN4ylTgUrE4Bj8ioDQHaE8?w=724&h=483&rs=1&pid=ImgDetMain" alt="Team Meeting" style="width: 100%; border-radius: 12px; margin-bottom: 12px;">
@@ -330,15 +334,25 @@
     <p>&copy; 2025 EventLine. All rights reserved. <br><a href="#contact">Contact us</a></p>
   </footer>
 
+
 <script>
   function filterEvents() {
-    const input = document.getElementById('searchInput').value.toLowerCase();
-    const events = document.querySelectorAll('.event');
-    events.forEach(event => {
-      const content = event.innerText.toLowerCase();
-      event.style.display = content.includes(input) ? '' : 'none';
-    });
-  }
+  const input = document.getElementById('searchInput').value.toLowerCase();
+  const events = document.querySelectorAll('.event');
+  const noResults = document.getElementById('noResults');
+
+  let anyVisible = false;
+
+  events.forEach(event => {
+    const content = event.innerText.toLowerCase();
+    const match = content.includes(input);
+    event.style.display = match ? '' : 'none';
+    if (match) anyVisible = true;
+  });
+
+  noResults.style.display = anyVisible ? 'none' : 'block';
+}
+
 
   function toggleTheme() {
     const html = document.documentElement;
@@ -376,6 +390,7 @@
 
   // No backend fetch — events won't persist after refresh
 </script>
+
 
 
 </body>
