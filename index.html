@@ -261,8 +261,7 @@
 
 <input id="time" type="datetime-local" placeholder="Time" required 
   style="width:100%; padding: 12px 16px; margin: 10px 0; border: 1px solid #ccc; border-radius: 8px; font-size: 1rem;" />
-
-<select id="type" required style="width:100%; padding: 12px 16px; margin: 10px 0; border: 1px solid #ccc; border-radius: 8px; font-size: 1rem;">
+<select id="type" required style="width:100%; padding: 12px 16px; margin: 10px 0; border: 1px solid #ccc; border-radius: 8px; font-size: 1rem;" onchange="handleTypeChange()">
   <option value="">Select type</option>
   <option value="meeting">Meeting</option>
   <option value="health">Health</option>
@@ -271,8 +270,24 @@
   <option value="travel">Travel</option>
   <option value="deadline">Deadline</option>
   <option value="personal">Personal</option>
+  <option value="other">Other</option>
 </select>
 
+<input type="text" id="customType" name="customType" placeholder="Enter custom type" style="display:none; width:100%; padding: 12px 16px; margin: 10px 0; border: 1px solid #ccc; border-radius: 8px; font-size: 1rem;" />
+
+<script>
+  function handleTypeChange() {
+    const select = document.getElementById('type');
+    const customInput = document.getElementById('customType');
+    if (select.value === 'other') {
+      customInput.style.display = 'block';
+      customInput.required = true;
+    } else {
+      customInput.style.display = 'none';
+      customInput.required = false;
+    }
+  }
+</script>
 
     <textarea id="desc" placeholder="Description" required 
       style="width:100%; padding: 12px 16px; margin: 10px 0; border: 1px solid #ccc; border-radius: 8px; font-size: 1rem; resize: vertical; min-height: 100px;"></textarea>
